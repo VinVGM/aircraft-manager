@@ -1,0 +1,74 @@
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.aircraft-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.aircraft-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+#runwayStatus {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-land {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-land:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.landed {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+}
+
+.distance-info {
+    display: flex;
+    gap: 1rem;
+    margin: 0.5rem 0;
+}
+
+.distance-info span {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: #007bff;
+    transition: width 0.3s ease;
+}
+
+.progress-bar.warning {
+    background-color: #ffc107;
+}
+
+.progress-bar.danger {
+    background-color: #dc3545;
+} 
