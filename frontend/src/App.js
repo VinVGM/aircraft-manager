@@ -1,13 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Grid, Card, CardContent, Button, Alert, List, ListItem, ListItemText, LinearProgress, Box, Chip } from '@mui/material';
+import { Container, Typography, Grid, Fade, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Overview2D from './components/Overview2D';
+import NavigationBar from './components/NavigationBar';
+import AddAircraftPanel from './components/AddAircraftPanel';
+import RunwayStatusPanel from './components/RunwayStatusPanel';
+import AirborneAircraftList from './components/AirborneAircraftList';
+import GroundAircraftList from './components/GroundAircraftList';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
 function App() {
   const [aircraft, setAircraft] = useState([]);
   const [runwayStatus, setRunwayStatus] = useState('No aircraft currently using the runway');
+  const [darkMode, setDarkMode] = useState(false);
+
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      primary: {
+        main: darkMode ? '#90caf9' : '#1976d2',
+        light: darkMode ? '#e3f2fd' : '#42a5f5',
+        dark: darkMode ? '#42a5f5' : '#1565c0',
+      },
+      secondary: {
+        main: darkMode ? '#f48fb1' : '#dc004e',
+        light: darkMode ? '#fce4ec' : '#ff4081',
+        dark: darkMode ? '#f06292' : '#9a0036',
+      },
+      background: {
+        default: darkMode ? '#121212' : '#f5f5f5',
+        paper: darkMode ? '#1e1e1e' : '#ffffff',
+      },
+    },
+  });
 
   useEffect(() => {
     const fetchAircraft = async () => {
@@ -20,7 +47,7 @@ function App() {
         const takeoffAircraft = response.data.find(a => a.status === 'takeoff');
         
         if (landingAircraft) {
-          setRunwayStatus(`Aircraft ${landingAircraft.flight_number} is currently landing (Distance: ${landingAircraft.distance.toFixed(2)} nm)`);
+          setRunwayStatus(`Aircraft ${landingAircraft.flight_number} is currently landing`);
         } else if (takeoffAircraft) {
           setRunwayStatus(`Aircraft ${takeoffAircraft.flight_number} is currently taking off`);
         } else {
@@ -47,178 +74,59 @@ function App() {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'landing': return 'warning';
-      case 'takeoff': return 'success';
-      default: return 'info';
-    }
-  };
-
-  const getEmergencyColor = (isEmergency) => {
-    return isEmergency ? 'error' : 'primary';
+  const getRunwayProgress = (aircraft) => {
+    if (!aircraft) return 0;
+    const startTime = aircraft.status === 'landing' ? aircraft.landing_start_time : aircraft.takeoff_start_time;
+    if (!startTime) return 0;
+    const elapsed = (Date.now() / 1000) - startTime;
+    const total = 5; // 5 seconds for both landing and takeoff
+    const remaining = Math.max(total - elapsed, 0);
+    return (remaining / total) * 100;
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center">
-        Aircraft Landing Manager
-      </Typography>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+    <Router>
+        <NavigationBar darkMode={darkMode} onToggleDarkMode={() => setDarkMode(!darkMode)} />
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <Fade in timeout={1000}>
+                <Typography variant="h4" component="h1" gutterBottom align="center">
+                  Aircraft Landing Manager
+                </Typography>
+              </Fade>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Add New Aircraft
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    onClick={() => addAircraft(false, false)}
-                  >
-                    Add Random Air Aircraft
-                  </Button>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                    <AddAircraftPanel onAddAircraft={addAircraft} />
                 </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    fullWidth
-                    onClick={() => addAircraft(true, false)}
-                  >
-                    Add Ground Aircraft
-                  </Button>
+
+                <Grid item xs={12} md={8}>
+                    <RunwayStatusPanel 
+                      runwayStatus={runwayStatus} 
+                      aircraft={aircraft} 
+                      getRunwayProgress={getRunwayProgress} 
+                    />
                 </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    fullWidth
-                    onClick={() => addAircraft(false, true)}
-                  >
-                    Add Emergency Air Aircraft
-                  </Button>
+
+                <Grid item xs={12} md={6}>
+                    <AirborneAircraftList aircraft={aircraft} />
                 </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    fullWidth
-                    onClick={() => addAircraft(true, true)}
-                  >
-                    Add Emergency Ground Aircraft
-                  </Button>
-                </Grid>
+
+                <Grid item xs={12} md={6}>
+                    <GroundAircraftList aircraft={aircraft} />
+                  </Grid>
               </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Runway Status
-              </Typography>
-              <Alert severity={runwayStatus.includes('landing') ? 'warning' : 
-                         runwayStatus.includes('taking off') ? 'success' : 'info'}>
-                {runwayStatus}
-              </Alert>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Aircraft in Air
-              </Typography>
-              <List>
-                {aircraft
-                  .filter(a => a.status === 'in_air')
-                  .map(a => (
-                    <ListItem key={a.id} divider>
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="subtitle1">
-                              {a.flight_number}
-                            </Typography>
-                            {a.is_emergency && (
-                              <Chip label="Emergency" color="error" size="small" />
-                            )}
-                            {a.going_around && (
-                              <Chip label="Going Around" color="warning" size="small" />
-                            )}
-                          </Box>
-                        }
-                        secondary={
-                          <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              Distance: {a.distance.toFixed(2)} nm | Speed: {a.speed} nm/s
-                            </Typography>
-                            <LinearProgress
-                              variant="determinate"
-                              value={(a.distance / 10) * 100}
-                              color={a.distance <= (a.is_emergency ? 5 : 2) ? 'error' : 'primary'}
-                              sx={{ mt: 1 }}
-                            />
-                            {a.distance <= (a.is_emergency ? 5 : 2) && !a.going_around && (
-                              <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
-                                Ready to land
-                              </Typography>
-                            )}
-                          </Box>
-                        }
-                      />
-                    </ListItem>
-                  ))}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Ground Aircraft
-              </Typography>
-              <List>
-                {aircraft
-                  .filter(a => a.status === 'ground')
-                  .map(a => (
-                    <ListItem key={a.id} divider>
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="subtitle1">
-                              {a.flight_number}
-                            </Typography>
-                            {a.is_emergency && (
-                              <Chip label="Emergency" color="error" size="small" />
-                            )}
-                          </Box>
-                        }
-                        secondary={
-                          <Typography variant="body2" color="success">
-                            Ready for takeoff
-                          </Typography>
-                        }
-                      />
-                    </ListItem>
-                  ))}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Container>
+            </>
+          } />
+          <Route path="/overview" element={<Overview2D />} />
+        </Routes>
+      </Container>
+    </Router>
+    </ThemeProvider>
   );
 }
 

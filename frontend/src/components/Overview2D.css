@@ -1,0 +1,418 @@
+.overview-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  height: 100vh;
+  background-color: var(--background-color);
+}
+
+.overview-section {
+  background: var(--paper-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.overview-section h2 {
+  margin: 0 0 1rem 0;
+  color: var(--text-color);
+  font-size: 1.5rem;
+}
+
+.runway-visualization {
+  height: 100px;
+  width: 100%;
+  background: #666;
+  border-radius: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+  overflow: visible;
+  border: 2px solid #999;
+}
+
+/* Runway center stripes */
+.runway-visualization::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px; /* Thin center line */
+  top: 50%;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 30px,
+    white 30px,
+    white 60px
+  );
+  opacity: 1;
+}
+
+/* Runway end stripes and number */
+.runway-visualization::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* End stripes containers */
+.runway-end-left, .runway-end-right {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.runway-end-left {
+  left: 0;
+}
+
+.runway-end-right {
+  right: 0;
+}
+
+/* Individual end stripes */
+.runway-end-left::before, .runway-end-left::after,
+.runway-end-right::before, .runway-end-right::after {
+  content: '';
+  height: 15px;
+  background: repeating-linear-gradient(
+    90deg,
+    white,
+    white 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+
+.airborne-visualization {
+  height: 400px;
+  background: linear-gradient(to bottom, #87CEEB 0%, var(--background-color) 100%);
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+  padding: 1rem 3rem;
+}
+
+/* Distance level lines */
+.distance-level {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}
+
+.distance-label {
+  position: absolute;
+  left: 10px;
+  transform: translateY(-50%);
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.aircraft {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.5s ease;
+  z-index: 1;
+}
+
+.airborne-aircraft {
+  position: absolute;
+  will-change: transform;
+  transition: all 0.5s ease;
+}
+
+.aircraft-icon {
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 0.3s ease;
+  color: var(--text-color);
+}
+
+.airborne-aircraft .aircraft-icon {
+  transform: rotate(-90deg);
+}
+
+.aircraft-info {
+  background: var(--paper-color);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+  color: var(--text-color);
+}
+
+.aircraft:hover .aircraft-info {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Trail effect for airborne aircraft */
+.airborne-aircraft::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 20px;
+  height: 2px;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateY(-50%);
+}
+
+/* Emergency indicator styles */
+.emergency {
+  color: #ff0000;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Subtle floating animation */
+.airborne-aircraft {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, calc(-50% - 3px)); }
+  100% { transform: translate(-50%, -50%); }
+}
+
+.ground-visualization {
+  height: 150px;
+  background: linear-gradient(to right, #90EE90, var(--background-color));
+  border-radius: 5px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
+  padding: 1.5rem;
+  overflow: visible;
+}
+
+.runway-aircraft {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 10;
+}
+
+.runway-aircraft .aircraft-info {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--paper-color);
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  color: var(--text-color);
+}
+
+.runway-aircraft:hover .aircraft-info {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.aircraft-info span {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ground-aircraft {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.ground-aircraft .aircraft-info {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--paper-color);
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  color: var(--text-color);
+}
+
+.ground-aircraft:hover .aircraft-info {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Adjust info box position for aircraft near edges */
+.ground-aircraft:first-child .aircraft-info {
+  left: 0;
+  transform: none;
+}
+
+.ground-aircraft:last-child .aircraft-info {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+/* Position adjustment for elements near the right edge */
+.aircraft:last-child .aircraft-info,
+.aircraft:nth-last-child(2) .aircraft-info {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+/* Position adjustment for elements near the left edge */
+.aircraft:first-child .aircraft-info,
+.aircraft:nth-child(2) .aircraft-info {
+  left: 0;
+  transform: none;
+}
+
+/* Ensure the runway section has proper spacing */
+.overview-section.runway-section {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+/* Landing animation */
+.runway-aircraft[data-status="landing"] {
+  animation: landing-animation 5s ease-in-out forwards;
+  opacity: 1;
+}
+
+.runway-aircraft[data-status="landing"] .aircraft-icon {
+  transform: rotate(90deg);
+}
+
+/* Takeoff animation */
+.runway-aircraft[data-status="takeoff"] {
+  animation: takeoff-animation 5s ease-in-out forwards;
+  opacity: 1;
+}
+
+.runway-aircraft[data-status="takeoff"] .aircraft-icon {
+  transform: rotate(-90deg);
+}
+
+@keyframes landing-animation {
+  0% {
+    left: 100%;
+    transform: translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 0;
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+@keyframes takeoff-animation {
+  0% {
+    left: 0;
+    transform: translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+/* Ensure info box stays visible during animations */
+.runway-aircraft[data-status="landing"]:hover .aircraft-info,
+.runway-aircraft[data-status="takeoff"]:hover .aircraft-info {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Add animation end state */
+.runway-aircraft[data-status="landing"],
+.runway-aircraft[data-status="takeoff"] {
+  animation-fill-mode: forwards;
+} 

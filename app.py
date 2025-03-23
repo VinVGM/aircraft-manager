@@ -23,6 +23,7 @@ class Aircraft:
         self.created_at = datetime.utcnow()
         self.speed = round(random.uniform(0.1, 0.3), 2)  # Random speed between 0.1-0.3 nm per second
         self.takeoff_start_time = None  # Track when takeoff started
+        self.landing_start_time = None  # Track when landing started
         self.is_emergency = is_emergency
         self.flight_number = f"EMG{flight_number}" if is_emergency else flight_number
         self.going_around = False  # Track if aircraft is going around
@@ -36,7 +37,9 @@ class Aircraft:
             'created_at': self.created_at.isoformat(),
             'speed': self.speed,
             'is_emergency': self.is_emergency,
-            'going_around': self.going_around
+            'going_around': self.going_around,
+            'landing_start_time': self.landing_start_time,
+            'takeoff_start_time': self.takeoff_start_time
         }
 
 def generate_flight_number():
@@ -75,12 +78,14 @@ def update_distances():
                     
                     # Emergency aircraft can land regardless of other aircraft
                     aircraft.status = 'landing'
+                    aircraft.landing_start_time = time.time()
                     threading.Timer(5.0, complete_landing, args=[aircraft.id]).start()
                     break
                 
                 # Normal landing for non-emergency aircraft
                 elif aircraft.distance <= 2 and not runway_in_use and not emergency_aircraft_near and not emergency_ground_aircraft:
                     aircraft.status = 'landing'
+                    aircraft.landing_start_time = time.time()
                     threading.Timer(5.0, complete_landing, args=[aircraft.id]).start()
                     break
                 # Force go around if emergency aircraft is on ground
