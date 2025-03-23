@@ -9,7 +9,6 @@ const Overview2D = () => {
     airborne: [],
     ground: []
   });
-  const [runwayStatus, setRunwayStatus] = useState('Runway is clear');
 
   // Define distance levels in nautical miles
   const distanceLevels = [10, 9, 8, 7, 6, 5, 4, 2];
@@ -17,7 +16,7 @@ const Overview2D = () => {
   useEffect(() => {
     const fetchAircraft = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/aircraft');
+        const response = await fetch('https://aircraft-manager-evnm.onrender.com/api/aircraft');
         const data = await response.json();
         
         // Categorize aircraft based on their status
