@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 import random
 import string
 from datetime import datetime
@@ -8,6 +9,7 @@ import threading
 import time
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # In-memory storage
 aircraft_list: List[Dict] = []
