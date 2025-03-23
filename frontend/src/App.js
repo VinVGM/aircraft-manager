@@ -9,7 +9,7 @@ import RunwayStatusPanel from './components/RunwayStatusPanel';
 import AirborneAircraftList from './components/AirborneAircraftList';
 import GroundAircraftList from './components/GroundAircraftList';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://aircraft-manager-evnm.onrender.com/api';
 
 function App() {
   const [aircraft, setAircraft] = useState([]);
