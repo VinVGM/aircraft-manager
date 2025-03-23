@@ -7,6 +7,7 @@ from typing import List, Dict
 import uuid
 import threading
 import time
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -146,4 +147,5 @@ if __name__ == '__main__':
     distance_thread = threading.Thread(target=update_distances, daemon=True)
     distance_thread.start()
     
-    app.run(debug=True) 
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True) 
