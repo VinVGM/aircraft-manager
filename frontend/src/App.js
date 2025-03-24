@@ -9,7 +9,7 @@ import RunwayStatusPanel from './components/RunwayStatusPanel';
 import AirborneAircraftList from './components/AirborneAircraftList';
 import GroundAircraftList from './components/GroundAircraftList';
 
-const API_BASE_URL = 'https://aircraft-manager-evnm.onrender.com/api';
+const API_BASE_URL = 'https://hidden-vanya-vgm-enterprises-60347566.koyeb.app/api';
 
 function App() {
   const [aircraft, setAircraft] = useState([]);

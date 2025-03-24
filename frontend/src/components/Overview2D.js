@@ -16,7 +16,7 @@ const Overview2D = () => {
   useEffect(() => {
     const fetchAircraft = async () => {
       try {
-        const response = await fetch('https://aircraft-manager-evnm.onrender.com/api/aircraft');
+        const response = await fetch('https://hidden-vanya-vgm-enterprises-60347566.koyeb.app/api/aircraft');
         const data = await response.json();
         
         // Categorize aircraft based on their status
