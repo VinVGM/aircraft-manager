@@ -15,7 +15,6 @@ const Overview2D = () => {
 
 
 
-
   useEffect(() => {
     const fetchAircraft = async () => {
       try {
@@ -41,7 +40,7 @@ const Overview2D = () => {
     fetchAircraft();
     const interval = setInterval(fetchAircraft, 1000);
     return () => clearInterval(interval);
-  }, [API_BASE_URL]);
+  }, []);
 
   useEffect(() => {
     // Set CSS variables based on theme
