@@ -9,11 +9,8 @@ import RunwayStatusPanel from './components/RunwayStatusPanel';
 import AirborneAircraftList from './components/AirborneAircraftList';
 import GroundAircraftList from './components/GroundAircraftList';
 
-let API_BASE_URL = 'https://hidden-vanya-vgm-enterprises-60347566.koyeb.app/api';
-const local = false;
-if(local){
-  API_BASE_URL = 'http://localhost:5000/api'
-}
+const API_BASE_URL = 'https://hidden-vanya-vgm-enterprises-60347566.koyeb.app/api';
+
 function App() {
   const [aircraft, setAircraft] = useState([]);
   const [runwayStatus, setRunwayStatus] = useState('No aircraft currently using the runway');
@@ -64,7 +61,7 @@ function App() {
     fetchAircraft();
     const interval = setInterval(fetchAircraft, 1000);
     return () => clearInterval(interval);
-  }, [API_BASE_URL]);
+  }, []);
 
   const addAircraft = async (isGround, isEmergency) => {
     try {
