@@ -64,7 +64,7 @@ function App() {
     fetchAircraft();
     const interval = setInterval(fetchAircraft, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [API_BASE_URL]);
 
   const addAircraft = async (isGround, isEmergency) => {
     try {

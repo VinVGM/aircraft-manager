@@ -15,7 +15,7 @@ const Overview2D = () => {
 
   let API_BASE_URL = 'https://hidden-vanya-vgm-enterprises-60347566.koyeb.app/api/aircraft';
   const local = true;
-  if(false){
+  if(local){
     API_BASE_URL = 'http://localhost:5000/api/aircraft'
   }
 
@@ -44,7 +44,7 @@ const Overview2D = () => {
     fetchAircraft();
     const interval = setInterval(fetchAircraft, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     // Set CSS variables based on theme
