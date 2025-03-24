@@ -13,10 +13,16 @@ const Overview2D = () => {
   // Define distance levels in nautical miles
   const distanceLevels = [10, 9, 8, 7, 6, 5, 4, 2];
 
+  let API_BASE_URL = 'https://hidden-vanya-vgm-enterprises-60347566.koyeb.app/api/aircraft';
+  const local = true;
+  if(false){
+    API_BASE_URL = 'http://localhost:5000/api/aircraft'
+  }
+
   useEffect(() => {
     const fetchAircraft = async () => {
       try {
-        const response = await fetch('https://hidden-vanya-vgm-enterprises-60347566.koyeb.app/api/aircraft');
+        const response = await fetch(API_BASE_URL);
         const data = await response.json();
         
         // Categorize aircraft based on their status
