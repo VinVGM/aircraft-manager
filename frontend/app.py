@@ -9,9 +9,9 @@ import threading
 import time
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)  
 
-# In-memory storage
+
 aircraft_list: List[Dict] = []
 
 class Aircraft:
@@ -21,12 +21,12 @@ class Aircraft:
         self.distance = distance
         self.status = 'ground' if is_ground else 'in_air'
         self.created_at = datetime.utcnow()
-        self.speed = round(random.uniform(0.1, 0.3), 2)  # Random speed between 0.1-0.3 nm per second
-        self.takeoff_start_time = None  # Track when takeoff started
-        self.landing_start_time = None  # Track when landing started
+        self.speed = round(random.uniform(0.1, 0.3), 2)  
+        self.takeoff_start_time = None  
+        self.landing_start_time = None  
         self.is_emergency = is_emergency
         self.flight_number = f"EMG{flight_number}" if is_emergency else flight_number
-        self.going_around = False  # Track if aircraft is going around
+        self.going_around = False  
 
     def to_dict(self):
         return {
@@ -50,65 +50,63 @@ def generate_flight_number():
 
 def update_distances():
     while True:
-        # Check if runway is available
+        
         runway_in_use = any(a.status == 'landing' or a.status == 'takeoff' for a in aircraft_list)
         aircraft_near_runway = any(a.status == 'in_air' and a.distance <= 2 for a in aircraft_list)
         
-        # Check for emergency aircraft near airport
+       
         emergency_aircraft_near = any(a.status == 'in_air' and a.is_emergency and a.distance <= 5 for a in aircraft_list)
         
-        # Check for emergency aircraft on ground waiting for takeoff
+       
         emergency_ground_aircraft = any(a.status == 'ground' and a.is_emergency for a in aircraft_list)
         
         for aircraft in aircraft_list:
             if aircraft.status == 'in_air':
-                # Update distance based on speed
+               
                 aircraft.distance = max(0, aircraft.distance - aircraft.speed)
                 
-                # Handle emergency aircraft priority landing
+                
                 if aircraft.is_emergency and aircraft.distance <= 5:
-                    # Force other aircraft to go around
+                   
                     for other in aircraft_list:
                         if (other.status == 'in_air' and 
                             not other.is_emergency and 
                             other.distance <= 5 and 
                             other.id != aircraft.id):
-                            other.distance += 5  # Add 5nm to their distance
+                            other.distance += 5  
                             other.going_around = True
                     
-                    # Emergency aircraft can land regardless of other aircraft
+                    
                     aircraft.status = 'landing'
                     aircraft.landing_start_time = time.time()
                     threading.Timer(5.0, complete_landing, args=[aircraft.id]).start()
                     break
                 
-                # Normal landing for non-emergency aircraft
                 elif aircraft.distance <= 2 and not runway_in_use and not emergency_aircraft_near and not emergency_ground_aircraft:
                     aircraft.status = 'landing'
                     aircraft.landing_start_time = time.time()
                     threading.Timer(5.0, complete_landing, args=[aircraft.id]).start()
                     break
-                # Force go around if emergency aircraft is on ground
+               
                 elif aircraft.distance <= 2 and emergency_ground_aircraft and not aircraft.is_emergency:
                     aircraft.distance += 5
                     aircraft.going_around = True
             
-            # Handle takeoff for ground aircraft
+       
             elif aircraft.status == 'ground' and not runway_in_use and not aircraft_near_runway:
-                # Emergency aircraft has priority for takeoff
+               
                 if aircraft.is_emergency:
                     aircraft.status = 'takeoff'
                     aircraft.takeoff_start_time = time.time()
                     threading.Timer(5.0, complete_takeoff, args=[aircraft.id]).start()
                     break
-                # For non-emergency aircraft, check if any emergency aircraft are waiting
                 elif not any(a.status == 'ground' and a.is_emergency for a in aircraft_list):
                     aircraft.status = 'takeoff'
                     aircraft.takeoff_start_time = time.time()
                     threading.Timer(5.0, complete_takeoff, args=[aircraft.id]).start()
                     break
         
-        time.sleep(1)  # Update every second
+        time.sleep(1)  
 
 def complete_landing(aircraft_id: str):
     global aircraft_list
@@ -135,14 +133,14 @@ def add_aircraft():
     if is_ground:
         aircraft = Aircraft(flight_number=flight_number, distance=0, is_ground=True, is_emergency=is_emergency)
     else:
-        distance = round(random.uniform(3, 10), 2)  # Random distance between 3-10 nm
+        distance = round(random.uniform(3, 10), 2)  
         aircraft = Aircraft(flight_number=flight_number, distance=distance, is_emergency=is_emergency)
     
     aircraft_list.append(aircraft)
     return jsonify(aircraft.to_dict())
 
 if __name__ == '__main__':
-    # Start the distance update thread
+   
     distance_thread = threading.Thread(target=update_distances, daemon=True)
     distance_thread.start()
     
